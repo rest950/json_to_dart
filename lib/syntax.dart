@@ -1,5 +1,6 @@
 import 'package:json_ast/json_ast.dart' show Node;
 import 'package:json_to_dart/helpers.dart';
+import 'package:recase/recase.dart';
 
 const String emptyListWarn = "list is empty";
 const String ambiguousListWarn = "list is ambiguous";
@@ -88,6 +89,8 @@ class TypeDefinition {
   bool get isPrimitive => _isPrimitive;
 
   bool get isPrimitiveList => _isPrimitive && name == 'List';
+
+  bool get isList => name == 'List';
 
   String _buildParseClass(String expression) {
     final properType = subtype != null ? subtype : name;
@@ -222,9 +225,19 @@ class ClassDefinition {
       final fieldName =
           fixFieldName(key, typeDef: f, privateField: privateFields);
       final sb = new StringBuffer();
+      if (f.isPrimitive || f.isList) {
+        sb.write('\t');
+        sb.write(
+            '@JsonKey(defaultValue: ${PRIMITIVE_TYPES_DEFAULT_VALUE[f.name]})\n');
+      }
       sb.write('\t');
       _addTypeDef(f, sb);
-      sb.write('? $fieldName;');
+      if (f.isPrimitive || f.isList) {
+        sb.write(' $fieldName;');
+      } else {
+        sb.write('? $fieldName;');
+      }
+
       return sb.toString();
     }).join('\n');
   }
@@ -287,7 +300,11 @@ class ClassDefinition {
       final f = fields[key]!;
       final fieldName =
           fixFieldName(key, typeDef: f, privateField: privateFields);
-      sb.write('this.$fieldName');
+      if (f.isPrimitive || f.isList) {
+        sb.write('required this.$fieldName');
+      } else {
+        sb.write('this.$fieldName');
+      }
       if (i != len) {
         sb.write(', ');
       }
@@ -299,32 +316,32 @@ class ClassDefinition {
 
   String get _jsonParseFunc {
     final sb = new StringBuffer();
-    sb.write('\t$name');
-    sb.write('.fromJson(Map<String, dynamic> json) {\n');
-    fields.keys.forEach((k) {
-      sb.write('\t\t${fields[k]!.jsonParseExpression(k, privateFields)}\n');
-    });
-    sb.write('\t}');
+    sb.write('\tfactory $name');
+    sb.write(
+        '.fromJson(Map<String, dynamic> json) => _\$${name}FromJson(json);');
+    // fields.keys.forEach((k) {
+    //   sb.write('\t\t${fields[k]!.jsonParseExpression(k, privateFields)}\n');
+    // });
+    // sb.write('\t}');
     return sb.toString();
   }
 
   String get _jsonGenFunc {
     final sb = new StringBuffer();
-    sb.write(
-        '\tMap<String, dynamic> toJson() {\n\t\tfinal Map<String, dynamic> data = new Map<String, dynamic>();\n');
-    fields.keys.forEach((k) {
-      sb.write('\t\t${fields[k]!.toJsonExpression(k, privateFields)}\n');
-    });
-    sb.write('\t\treturn data;\n');
-    sb.write('\t}');
+    sb.write('\tMap<String, dynamic> toJson() => _\$${name}ToJson(this);\n');
+    // fields.keys.forEach((k) {
+    //   sb.write('\t\t${fields[k]!.toJsonExpression(k, privateFields)}\n');
+    // });
+    // sb.write('\t\treturn data;\n');
+    // sb.write('\t}');
     return sb.toString();
   }
 
   String toString() {
     if (privateFields) {
-      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+      return 'import \'package:json_annotation/json_annotation.dart\';\n\npart \'${name.snakeCase}.g.dart\';\n\n@JsonSerializable()\nclass $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
     } else {
-      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+      return 'import \'package:json_annotation/json_annotation.dart\';\n\npart \'${name.snakeCase}.g.dart\';\n\n@JsonSerializable()\nclass $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
     }
   }
 }

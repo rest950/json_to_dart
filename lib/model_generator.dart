@@ -6,7 +6,9 @@ import 'package:json_to_dart/helpers.dart';
 import 'package:json_to_dart/syntax.dart';
 
 class DartCode extends WithWarning<String> {
-  DartCode(String result, List<Warning> warnings) : super(result, warnings);
+  DartCode(String result, List<Warning> warnings, {this.className})
+      : super(result, warnings);
+  final String? className;
 
   String get code => this.result;
 }
@@ -144,13 +146,44 @@ class ModelGenerator {
         allClasses.map((c) => c.toString()).join('\n'), warnings);
   }
 
+  List<DartCode> generateUnsafeDartEach(String rawJson) {
+    final jsonRawData = decodeJSON(rawJson);
+    final astNode = parse(rawJson, Settings());
+    List<Warning> warnings =
+        _generateClassDefinition(_rootClassName, jsonRawData, "", astNode);
+    // after generating all classes, replace the omited similar classes.
+    allClasses.forEach((c) {
+      final fieldsKeys = c.fields.keys;
+      fieldsKeys.forEach((f) {
+        final typeForField = c.fields[f];
+        if (typeForField != null) {
+          if (sameClassMapping.containsKey(typeForField.name)) {
+            c.fields[f]!.name = sameClassMapping[typeForField.name]!;
+          }
+        }
+      });
+    });
+    return allClasses.map((e) {
+      print(e.name);
+      return DartCode(e.toString(), warnings, className: e.name);
+    }).toList();
+  }
+
   /// generateDartClasses will generate all classes and append one after another
   /// in a single string. The [rawJson] param is assumed to be a properly
   /// formatted JSON string. If the generated dart is invalid it will throw an error.
   DartCode generateDartClasses(String rawJson) {
     final unsafeDartCode = generateUnsafeDart(rawJson);
+    // final formatter = new DartFormatter();
+    return new DartCode(unsafeDartCode.code, unsafeDartCode.warnings);
+  }
+
+  List<DartCode> generateDartClassesEach(String rawJson) {
+    final unsafeDartCodes = generateUnsafeDartEach(rawJson);
     final formatter = new DartFormatter();
-    return new DartCode(
-        formatter.format(unsafeDartCode.code), unsafeDartCode.warnings);
+    return unsafeDartCodes
+        .map((e) => DartCode(formatter.format(e.code), e.warnings,
+            className: e.className))
+        .toList();
   }
 }

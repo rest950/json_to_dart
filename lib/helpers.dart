@@ -18,6 +18,21 @@ const Map<String, bool> PRIMITIVE_TYPES = const {
   'Null': true,
 };
 
+const Map<String, String> PRIMITIVE_TYPES_DEFAULT_VALUE = const {
+  'int': '0',
+  'double': '0.0',
+  'String': '\'\'',
+  'bool': 'false',
+  // 'DateTime': false,
+  'List<DateTime>': '[]',
+  'List<int>': '[]',
+  'List<double>': '[]',
+  'List<String>': '[]',
+  'List<bool>': '[]',
+  'List': '[]',
+  // 'Null': true,
+};
+
 enum ListType { Object, String, Double, Int, Null }
 
 class MergeableListType {
