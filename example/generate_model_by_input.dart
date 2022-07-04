@@ -14,19 +14,24 @@ String _scriptPath() {
   return script;
 }
 
-main() {
-  final classGenerator = new ModelGenerator('Sample');
+main(List<String> args) {
+  final rootClassName = args.isNotEmpty ? args.first : 'noName';
+  final classGenerator = new ModelGenerator(rootClassName);
   final currentDirectory = dirname(_scriptPath());
-  final filePath = normalize(join(currentDirectory, 'sample.json'));
+  final filePath = normalize(join(currentDirectory, 'input.json'));
   final jsonRawData = new File(filePath).readAsStringSync();
   // DartCode dartCode = classGenerator.generateDartClasses(jsonRawData);
   List<DartCode> dartCodeFiles =
       classGenerator.generateDartClassesEach(jsonRawData);
+  final genDirectory = dirname(_scriptPath()) + '/gen/';
+  final dir = new Directory(genDirectory);
+  dir.listSync().forEach((element) {
+    element.delete();
+  });
   dartCodeFiles.forEach((element) async {
     print(element.code);
-    final currentDirectory = dirname(_scriptPath()) + '/gen/';
     final filePath = normalize(join(
-        currentDirectory, '${element.className?.snakeCase ?? 'no_name'}.dart'));
+        genDirectory, '${element.className?.snakeCase ?? 'no_name'}.dart'));
     await File(filePath).writeAsString(element.code);
   });
   // print(dartCode.code);

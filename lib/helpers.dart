@@ -19,7 +19,7 @@ const Map<String, bool> PRIMITIVE_TYPES = const {
 };
 
 const Map<String, String> PRIMITIVE_TYPES_DEFAULT_VALUE = const {
-  'int': '0',
+  'int': '-1',
   'double': '0.0',
   'String': '\'\'',
   'bool': 'false',
