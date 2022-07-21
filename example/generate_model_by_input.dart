@@ -25,9 +25,13 @@ main(List<String> args) {
       classGenerator.generateDartClassesEach(jsonRawData);
   final genDirectory = dirname(_scriptPath()) + '/gen/';
   final dir = new Directory(genDirectory);
-  dir.listSync().forEach((element) {
-    element.delete();
-  });
+  if (dir.existsSync()) {
+    dir.listSync().forEach((element) {
+      element.delete();
+    });
+  } else {
+    dir.createSync();
+  }
   dartCodeFiles.forEach((element) async {
     print(element.code);
     final filePath = normalize(join(

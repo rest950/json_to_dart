@@ -180,6 +180,9 @@ class ModelGenerator {
 
   List<DartCode> generateDartClassesEach(String rawJson) {
     final unsafeDartCodes = generateUnsafeDartEach(rawJson);
+    return unsafeDartCodes
+        .map((e) => DartCode(e.code, e.warnings, className: e.className))
+        .toList();
     final formatter = new DartFormatter();
     return unsafeDartCodes
         .map((e) => DartCode(formatter.format(e.code), e.warnings,
