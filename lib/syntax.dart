@@ -227,16 +227,18 @@ class ClassDefinition {
       final sb = new StringBuffer();
       if (f.isPrimitive || f.isList) {
         sb.write('\t');
-        sb.write(
-            '@JsonKey(defaultValue: ${PRIMITIVE_TYPES_DEFAULT_VALUE[f.name]})\n');
+        //都改Nullable 先拿掉Default
+        // sb.write(
+        //     '@JsonKey(defaultValue: ${PRIMITIVE_TYPES_DEFAULT_VALUE[f.name]})\n');
       }
       sb.write('\t');
       _addTypeDef(f, sb);
-      if (f.isPrimitive || f.isList) {
-        sb.write(' $fieldName;');
-      } else {
-        sb.write('? $fieldName;');
-      }
+      sb.write('? $fieldName;');
+      // if (f.isPrimitive || f.isList) {
+      //   sb.write(' $fieldName;');
+      // } else {
+      //   sb.write('? $fieldName;');
+      // }
 
       return sb.toString();
     }).join('\n');
@@ -300,11 +302,12 @@ class ClassDefinition {
       final f = fields[key]!;
       final fieldName =
           fixFieldName(key, typeDef: f, privateField: privateFields);
-      if (f.isPrimitive || f.isList) {
-        sb.write('required this.$fieldName');
-      } else {
-        sb.write('this.$fieldName');
-      }
+      sb.write('this.$fieldName');
+      // if (f.isPrimitive || f.isList) {
+      //   sb.write('required this.$fieldName');
+      // } else {
+      //   sb.write('this.$fieldName');
+      // }
       if (i != len) {
         sb.write(', ');
       }
