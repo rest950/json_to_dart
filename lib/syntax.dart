@@ -342,9 +342,9 @@ class ClassDefinition {
 
   String toString() {
     if (privateFields) {
-      return 'import \'package:json_annotation/json_annotation.dart\';\n\npart \'${name.snakeCase}.g.dart\';\n\n@JsonSerializable()\nclass $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+      return 'import \'package:json_annotation/json_annotation.dart\';\n\npart \'${name.snakeCase}.g.dart\';\n\n@JsonSerializable(explicitToJson: true)\nclass $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
     } else {
-      return 'import \'package:json_annotation/json_annotation.dart\';\n\npart \'${name.snakeCase}.g.dart\';\n\n@JsonSerializable()\nclass $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+      return 'import \'package:json_annotation/json_annotation.dart\';\n\npart \'${name.snakeCase}.g.dart\';\n\n@JsonSerializable(explicitToJson: true)\nclass $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
     }
   }
 }

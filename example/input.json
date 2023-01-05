@@ -1,1 +1,22 @@
-[{"currency":"SOS","id":"1"},{"currency":"IRR","id":"2"},{"currency":"MYR","id":"3"},{"currency":"GEL","id":"4"}]
+{
+  "locale": "zh-TW",
+  "lastName": "asdf",
+  "firstName": "asdf",
+  "birthday": "2000-01-01",
+  "address": "asdfasdfasdf",
+  "kycKind": 0,
+  "incomeSource": 2,
+  "onlyFurtherInfo": false,
+  "otherNationality": "",
+  "country": "",
+  "career": 5,
+  "picture": "",
+  "identityCard": {
+    "idNumber": "A123456789",
+    "credentialAt": "2020-01-01",
+    "credentialSite": "asdf",
+    "credentialWay": "0",
+    "pictureFront": "",
+    "pictureBack": ""
+  }
+}
